@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+    run_clickup_serveur:
+        user: "1000:1000"
+        build:
+            context: .
+            args:
+                DOCKER_GATEWAY_HOST: ${DOCKER_GATEWAY_HOST:-host.docker.internal}
+        volumes:
+            - ./:/var/www/html
+        environment:
+            APACHE_DOCUMENT_ROOT: /var/www/html/public
+            XDEBUG_CONFIG: remote_host=${DOCKER_GATEWAY_HOST:-host.docker.internal}
+
+        restart: on-failure
+        ports:
+            - "8082:80"
