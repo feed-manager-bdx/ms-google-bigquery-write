@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('/', [\App\Http\Controllers\LowpriceController::class, 'lowPrice']);
+Route::get('/login', [\App\Http\Controllers\LowpriceController::class, 'googleLogIn']);
