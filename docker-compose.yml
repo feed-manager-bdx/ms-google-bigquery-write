@@ -15,7 +15,7 @@ services:
 
         restart: on-failure
         ports:
-            - "8083:80"
+            - "8084:80"
 
     db_lowprice:
         image: mariadb:10.3
@@ -27,4 +27,4 @@ services:
         command: mysqld --general-log=1 --default-authentication-plugin=mysql_native_password --general-log-file=/var/log/mysql/general-log.log
         restart: on-failure
         ports:
-        - "9908:3306"
+        - "9909:3306"

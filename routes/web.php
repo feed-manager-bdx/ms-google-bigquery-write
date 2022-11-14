@@ -14,5 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::get('/', [\App\Http\Controllers\LowpriceController::class, 'lowPrice']);
-Route::get('/login', [\App\Http\Controllers\LowpriceController::class, 'googleLogIn']);
+Route::get('/test', [\App\Http\Controllers\LowpriceController::class, 'test']);
+
