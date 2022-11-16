@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth.token')->post('/productsPrices', [\App\Http\Controllers\LowpriceController::class, 'postToBigQuery']);
+Route::middleware('auth.token')->post('/productsPricesCsv', [\App\Http\Controllers\LowpriceController::class, 'getProductsPrices']);

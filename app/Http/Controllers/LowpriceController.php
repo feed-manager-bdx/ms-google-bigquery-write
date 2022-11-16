@@ -30,8 +30,30 @@ class LowpriceController extends Controller
         $table = $dataset->table('productsPrices');
         $insertResponse = $table->insertRows(
             $products
-            //$testRow
         );
         return response($insertResponse->failedRows());
+    }
+
+    public function getProductsPrices(Request $request) {
+        $json = ConfigurationProvider::getJson();
+        $merchant_id=$request->json()->get('merchant_id');
+        $bigQuery = new BigQueryClient([
+            'projectId' => 'saaslowprices',
+            'keyFilePath' => $json
+        ]);
+
+        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) limit 10";
+        $queryJobConfig = $bigQuery->query($query)
+            ->parameters([
+                'merchant_id' => $merchant_id
+            ]);
+
+        $queryResults = $bigQuery->runQuery($queryJobConfig);
+        $csv = [];
+        foreach ($queryResults as $row) {
+            $csv[] = $row;
+        }
+
+        return response(json_encode($csv));
     }
 }
