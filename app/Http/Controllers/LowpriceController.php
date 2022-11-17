@@ -14,10 +14,6 @@ class LowpriceController extends Controller
 {
     public function postToBigQuery(Request $request) {
         $products = $request->json()->get('products');
-        //$products = json_decode($products,true);
-        $testRow= [
-            ['data'=> ['merchantId'=>1, 'productId'=>1]]
-        ];
         for ($i=0; $i<sizeof($products); $i++) {
             $products[$i]=['data'=>$products[$i]];
         }
@@ -73,6 +69,8 @@ class LowpriceController extends Controller
         );
         unlink($fileName);
 
-        return response(json_encode($bucket));
+        $dlLink = $bucket->object($fileName)->signedUrl(new \DateTime('tomorrow'));
+
+        return response($dlLink);
     }
 }
