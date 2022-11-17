@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\ConfigurationProvider\ConfigurationProvider;
+use Google\Cloud\Storage\StorageClient;
 use Illuminate\Http\Request;
 use Google\Cloud\BigQuery\BigQueryClient;
 use App\Models\Customer;
-use App\Helpers\ApiShopping;
 use Illuminate\Support\Facades\Log;
 
 
@@ -42,7 +42,7 @@ class LowpriceController extends Controller
             'keyFilePath' => $json
         ]);
 
-        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) limit 10";
+        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id)";
         $queryJobConfig = $bigQuery->query($query)
             ->parameters([
                 'merchant_id' => $merchant_id
@@ -54,6 +54,25 @@ class LowpriceController extends Controller
             $csv[] = $row;
         }
 
-        return response(json_encode($csv));
+        $fileName = $merchant_id.'_'.time().".csv";
+        $file = fopen($fileName,"w");
+        fputcsv($file, ['product_id', 'minPrice'],';');
+        foreach ($csv as $line) {
+            fputcsv($file, $line, ';');
+        }
+        fclose($file);
+
+        $storage = new StorageClient([
+            'projectId' => 'saaslowprices',
+            'keyFilePath' => $json
+        ]);
+
+        $bucket = $storage->bucket('lowpricecsv');
+        $bucket->upload(
+            fopen($fileName, 'r')
+        );
+        unlink($fileName);
+
+        return response(json_encode($bucket));
     }
 }

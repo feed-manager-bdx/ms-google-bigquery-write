@@ -9,6 +9,7 @@
         "doctrine/dbal": "^3.5",
         "google/apiclient": "^2.12",
         "google/cloud-bigquery": "^1.23",
+        "google/cloud-storage": "^1.29",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
