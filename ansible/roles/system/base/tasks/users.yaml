@@ -1,0 +1,34 @@
+---
+
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    home: "{{ item.home }}"
+    shell: "/bin/nologin"
+  with_items: "{{ system.users|default([]) }}"
+
+- name: Create .ssh directory
+  file:
+    path: "{{ item.home }}/.ssh/"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0700
+  with_items: "{{ system.users|default([]) }}"
+
+- name: Checking that /var/www/.bash_history exists
+  stat:
+    path: /var/www/.bash_history
+  register: stat_var_www
+
+- name: Make www-data's .bash_history writable
+  file:
+    path: "/var/www/.bash_history"
+    owner: "www-data"
+    group: "www-data"
+  when: stat_var_www.stat.exists
+
+- name: Add SSH keys
+  lineinfile:
+    dest: /home/ubuntu/.ssh/authorized_keys
+    line: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCw9d27Oiv0HmCN7m5y6+YEjn8TVAYZRi7qM5mjZzdgHGKCZsvB9IwOqwqCelmJK884MOtP1t3hjmP6ow3XmiFuaD9hSH5EeYy57wz+0b13qxvA3nNydq9U7pBWmdamEVrdtkdXa7d9u+c7DpByvihPONZbqiBRHmZ0MGzVSvsKU9Qq4SofAWKr/joOpqP7U71WJk0c8Wjp1ZXvT8JgySIec1I008hhhEPU/V+q9WM9ZIPthn9s1nX0EXh1qhv5v/SsnJL0avEs40kZ5LtMvPAl7Nr9xyqVtJSkoN8C17yasVdWoDNCKBhZ2WLdkrkYA4f9LAGzHb8RRvWYDuEHtgYXTBHI1L1dw6HB/I0NaLKkIS73WD4MpnKG4Y1XIe13e06Qvs8MufVC/81pHadVUpBXbvh6Warma75yu/tIhvIf8G7ZgUmkrU0ZFXci48tpOv6cgCXHDJaFGW2wqHTig8x4rdgSA7Hhx9/X1zKiasJZVtOxf0sc36pClPplavTeGF3MFq3MScwc6Io6Zvzd8BDOU4lftF0lCUTK0ooWSkO26qyH+X8GGJKlt91MrZwj2S/BSRvcEEutdIfkF+B8m1OTSVR66zZXuldEUZfnrrwHW1Z1UspQW45bdgoK3+gXKDFcqNjbD52tsEOX9wDT3lBRuHHUwk6klgYbxMet++zgQ== zarhdad@labelium.com"

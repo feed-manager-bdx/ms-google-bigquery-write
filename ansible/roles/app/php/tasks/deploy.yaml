@@ -1,0 +1,6 @@
+---
+
+- name: Run composer install
+  shell: php /usr/local/bin/composer install
+  args:
+    chdir: "{{ project.path }}"

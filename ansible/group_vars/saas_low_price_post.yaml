@@ -1,0 +1,27 @@
+system:
+  apt:
+    repositories:
+      - ppa:ondrej/php
+
+php:
+  versions:
+    - version: 8.1
+  projects:
+    - path: /var/www/saas_low_price_post/
+      framework: laravel
+
+apache:
+  vhosts:
+    - domain: 51.210.150.102
+      ip: 51.210.150.102
+      dir: /var/www/saas_low_price_post/public/
+      email: court@labelium.com
+      phpversion: 81
+
+git:
+  - repo: git@github.com:feed-manager-bdx/saas-low-prices-post.git
+    dest: /var/www/saas_low_price_post/
+    version: master
+    deploy_key: saas_low_price_post-rsa
+    user: www-data
+    group: www-data

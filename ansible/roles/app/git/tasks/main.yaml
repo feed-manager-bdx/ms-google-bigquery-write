@@ -1,0 +1,41 @@
+---
+
+- name: Create repository directories
+  file:
+    path: "{{ item.dest }}"
+    state: directory
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+  become: True
+  become_user: root
+  with_items: "{{ git }}"
+
+- name: Create deploy key directory for www-data
+  file:
+    path: "/var/www/.ssh"
+    state: directory
+    mode: 0700
+    owner: "www-data"
+    group: "www-data"
+  become: True
+  become_user: root
+
+- name: Copy deploy (private) keys
+  copy:
+    src: "{{ item.deploy_key }}"
+    dest: "~/.ssh/{{ item.deploy_key }}"
+    mode: 0600
+  become: True
+  become_user: "{{ item.user }}"
+  with_items: "{{ git }}"
+
+- name: Clone/pull from git
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    version: "{{item.version}}"
+    accept_hostkey: yes
+    key_file: "~/.ssh/{{ item.deploy_key }}"
+  become: True
+  become_user: "{{ item.user }}"
+  with_items: "{{ git }}"

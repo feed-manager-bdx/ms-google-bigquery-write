@@ -1,0 +1,16 @@
+---
+
+- name: Generate vhost
+  template:
+    src: vhost.conf.j2
+    dest: /etc/apache2/sites-available//{{ vhost.ip }}.conf
+  notify: restart apache
+
+- name: Enable vhost
+  shell: a2ensite {{ vhost.ip }}
+
+- name: Add domain to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} {{ vhost.ip }}"
+    regexp: "{{ vhost.domain }}"

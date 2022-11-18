@@ -1,0 +1,33 @@
+---
+
+- name: Install Apache2
+  apt:
+    name: apache2
+    state: latest
+
+- name: enable Apache2
+  service:
+    name: apache2
+    enabled: true
+
+#- include_tasks: ssl.yaml
+
+- name: Enable mod_proxy_fcgi
+  apache2_module:
+    name: proxy_fcgi
+
+- name: Enable mod_headers
+  apache2_module:
+    name: headers
+
+- name: Enable mod_rewrite
+  apache2_module:
+    name: rewrite
+
+- include_tasks: vhost.yml
+  with_items: "{{ apache.vhosts }}"
+  loop_control:
+    loop_var: vhost
+
+- name: Disable default vhost
+  shell: a2dissite 000-default

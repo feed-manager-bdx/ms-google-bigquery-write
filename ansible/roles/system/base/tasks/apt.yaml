@@ -1,0 +1,27 @@
+---
+
+- name: Install APT Repositories
+  apt_repository:
+    repo: "{{ item }}"
+  with_items: "{{ (system.apt|default({})).repositories|default([]) }}"
+
+- name: Update APT index
+  apt:
+    update_cache: true
+
+- name: Install miscelaneous tools
+  apt:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+      - git
+      - vim
+      - curl
+      - atop
+      - htop
+      - run-one
+
+- name: Install additional APT packages
+  apt:
+    name: "{{ (system.apt|default({})).packages|default([]) }}"

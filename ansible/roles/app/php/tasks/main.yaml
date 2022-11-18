@@ -1,0 +1,6 @@
+---
+
+- include_tasks: deploy.yaml
+  with_items: "{{ php.projects }}"
+  loop_control:
+    loop_var: project

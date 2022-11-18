@@ -1,0 +1,20 @@
+---
+
+- name: Enable mod_ssl
+  apache2_module:
+    name: ssl
+
+- name: Create /etc/apache2/ssl directory
+  file:
+    path: /etc/apache2/ssl
+    state: directory
+
+- name: Create SSL crt
+  copy:
+    src: feed-manager.com.crt
+    dest: /etc/apache2/ssl/feed-manager.com.crt
+
+- name: Create SSL key
+  copy:
+    src: feed-manager.com.key
+    dest: /etc/apache2/ssl/feed-manager.com.key

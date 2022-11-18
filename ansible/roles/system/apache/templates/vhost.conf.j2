@@ -1,0 +1,37 @@
+<Virtualhost {{ vhost.domain }}:80>
+    ServerName {{ vhost.domain }}
+
+       DocumentRoot {{ vhost.dir }}
+       DirectoryIndex index.php
+
+       <Directory {{ vhost.dir }}>
+           Require all granted
+           AllowOverride all
+
+           <FilesMatch \.php$>
+               SetHandler proxy:fcgi://127.0.0.1:90{{vhost.phpversion}}
+           </FilesMatch>
+       </Directory>
+
+    CustomLog /var/log/apache2/{{ vhost.domain }}.log combined
+    ErrorLog  /var/log/apache2/{{ vhost.domain }}.err
+</Virtualhost>
+
+<Virtualhost {{ vhost.domain }}:443>
+    ServerName {{ vhost.domain }}
+
+    DocumentRoot {{ vhost.dir }}
+    DirectoryIndex index.php
+
+    <Directory {{ vhost.dir }}>
+        Require all granted
+        AllowOverride all
+
+        <FilesMatch \.php$>
+            SetHandler proxy:fcgi://127.0.0.1:90{{vhost.phpversion}}
+        </FilesMatch>
+    </Directory>
+
+    CustomLog /var/log/apache2/{{ vhost.domain }}.log combined
+    ErrorLog  /var/log/apache2/{{ vhost.domain }}.err
+</Virtualhost>

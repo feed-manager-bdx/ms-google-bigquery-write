@@ -1,0 +1,67 @@
+---
+
+- name: install php-fpm
+  apt:
+    name: "php{{ item[0].version }}-{{ item[1] }}"
+  with_nested:
+    - "{{ php.versions }}"
+    - - "fpm"
+      - "cli"
+      - "pdo"
+      - "curl"
+      - "bcmath"
+      - "soap"
+      - "mbstring"
+      - "mysqlnd"
+      - "xml"
+      - "gd"
+      - "intl"
+      - "imap"
+      - "zip"
+      - "opcache"
+      - "apcu"
+      - "readline"
+  notify: "restart php-{{ item[0].version }}-fpm"
+
+- name: install composer
+  apt:
+    name: composer
+
+- name: change FPM port
+  lineinfile:
+    path: "/etc/php/{{ item.version }}/fpm/pool.d/www.conf"
+    regexp: "^listen[ |=]"
+    line: "listen = 127.0.0.1:90{{ item.version | replace('.', '') }}"
+  with_items: "{{ php.versions }}"
+
+- name: install 99-labelium.ini
+  template:
+    src: 99-labelium.ini.j2
+    dest: /etc/php/{{ item.version }}/fpm/conf.d/99-labelium.ini
+  notify: "restart php-{{ item.version }}-fpm"
+  with_items: "{{ php.versions }}"
+
+- name: Fix composer permissions
+  file:
+    path: /var/www/.composer
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Install Composer
+  shell: curl -sS https://getcomposer.org/installer | php
+  args:
+    chdir: /usr/src/
+    creates: /usr/local/bin/composer
+    warn: false
+  become: yes
+
+- name: Add Composer to global path
+  copy:
+    src: /usr/src/composer.phar
+    dest: /usr/local/bin/composer
+    group: root
+    mode: '0755'
+    owner: root
+    remote_src: yes
+  become: yes
