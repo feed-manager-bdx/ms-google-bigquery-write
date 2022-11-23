@@ -51,13 +51,16 @@ class ApiGoogleStorage extends Model
             'projectId' => 'saaslowprices',
             'keyFilePath' => $json
         ]);
-        $bucket = $storage->bucket('lowpricecsv');
+        $bucketName = 'lowpricecsv';
+        $bucket = $storage->bucket($bucketName);
         $bucket->upload(
-            fopen($fileName, 'r')
+            fopen($fileName, 'r'),
+            [
+                'predefinedAcl' => 'publicRead'
+            ]
         );
         unlink($fileName);
-        $dlLink = $bucket->object($fileName)->signedUrl(new \DateTime('tomorrow'));
 
-        return $dlLink;
+        return 'https://storage.googleapis.com/'.$bucketName.'/'.$fileName;
     }
 }
