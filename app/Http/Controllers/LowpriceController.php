@@ -8,6 +8,7 @@ use App\Services\ConfigurationProvider\ConfigurationProvider;
 use Google\Cloud\Storage\StorageClient;
 use Illuminate\Http\Request;
 use Google\Cloud\BigQuery\BigQueryClient;
+use Illuminate\Support\Facades\Log;
 
 class LowpriceController extends Controller
 {
@@ -27,7 +28,9 @@ class LowpriceController extends Controller
 
     public function productPricesCsv(Request $request) {
         $merchant_id=$request->json()->get('merchant_id');
-        $return = $this->apiGoogleStorage->googleStorage($merchant_id);
+        $country_code=$request->json()->get('country_code');
+        Log::info($country_code);
+        $return = $this->apiGoogleStorage->googleStorage($merchant_id, $country_code);
 
         return response($return);
     }

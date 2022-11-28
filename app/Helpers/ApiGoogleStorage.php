@@ -23,24 +23,25 @@ use DateTime;
 
 class ApiGoogleStorage extends Model
 {
-    public function googleStorage($merchant_id)
+    public function googleStorage($merchant_id, $country_code)
     {
         $json = ConfigurationProvider::getJson();
         $bigQuery = new BigQueryClient([
             'projectId' => 'saaslowprices',
             'keyFilePath' => $json
         ]);
-        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id)";
+        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) AND countryCode like(@country_code)";
         $queryJobConfig = $bigQuery->query($query)
             ->parameters([
-                'merchant_id' => $merchant_id
+                'merchant_id' => $merchant_id,
+                'country_code'=>$country_code
             ]);
         $queryResults = $bigQuery->runQuery($queryJobConfig);
         $csv = [];
         foreach ($queryResults as $row) {
             $csv[] = $row;
         }
-        $fileName = $merchant_id.".csv";
+        $fileName = $merchant_id.'-'.$country_code.".csv";
         $file = fopen($fileName,"w");
         fputcsv($file, ['product_id', 'minPrice'],';');
         foreach ($csv as $line) {
