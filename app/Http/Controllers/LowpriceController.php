@@ -19,6 +19,7 @@ class LowpriceController extends Controller
         $this->apiBigQuery = new ApiBigQuery();
         $this->apiGoogleStorage = new ApiGoogleStorage();
     }
+
     public function productsPrices(Request $request) {
         $products = $request->json()->get('products');
         $response = $this->apiBigQuery->bigQuery($products);

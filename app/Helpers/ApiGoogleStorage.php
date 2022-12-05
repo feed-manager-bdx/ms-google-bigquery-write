@@ -45,27 +45,6 @@ class ApiGoogleStorage extends Model
             $productId=$row['productId'];
             $csv[] = [$productId, $min_price, $date];
         }
-        $fileName = $merchant_id.'-'.$country_code.".csv";
-        $file = fopen($fileName,"w");
-        fputcsv($file, ['product_id', 'min_price', 'date'],';');
-        foreach ($csv as $line) {
-            fputcsv($file, $line, ';');
-        }
-        fclose($file);
-        $storage = new StorageClient([
-            'projectId' => 'saaslowprices',
-            'keyFilePath' => $json
-        ]);
-        $bucketName = 'lowpricecsv';
-        $bucket = $storage->bucket($bucketName);
-        $bucket->upload(
-            fopen($fileName, 'r'),
-            [
-                'predefinedAcl' => 'publicRead'
-            ]
-        );
-        unlink($fileName);
-
-        return 'https://storage.googleapis.com/'.$bucketName.'/'.$fileName;
+        return $csv;
     }
 }
