@@ -11,6 +11,7 @@ namespace App\Helpers;
 use App\Models\Customer;
 use App\Services\ConfigurationProvider\ConfigurationProvider;
 use Google\Cloud\BigQuery\BigQueryClient;
+use Google\Cloud\BigQuery\Date;
 use Google\Cloud\Storage\StorageClient;
 use Google_Client;
 use Google_Exception;
@@ -30,7 +31,7 @@ class ApiGoogleStorage extends Model
             'projectId' => 'saaslowprices',
             'keyFilePath' => $json
         ]);
-        $query = "SELECT productId, minPrice FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) AND countryCode like(@country_code)";
+        $query = "SELECT productId, minPrice, date FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) AND countryCode like(@country_code)";
         $queryJobConfig = $bigQuery->query($query)
             ->parameters([
                 'merchant_id' => $merchant_id,
@@ -39,11 +40,14 @@ class ApiGoogleStorage extends Model
         $queryResults = $bigQuery->runQuery($queryJobConfig);
         $csv = [];
         foreach ($queryResults as $row) {
-            $csv[] = $row;
+            $date = $row['date']->formatAsString();
+            $min_price = $row['minPrice'];
+            $productId=$row['productId'];
+            $csv[] = [$productId, $min_price, $date];
         }
         $fileName = $merchant_id.'-'.$country_code.".csv";
         $file = fopen($fileName,"w");
-        fputcsv($file, ['product_id', 'minPrice'],';');
+        fputcsv($file, ['product_id', 'min_price', 'date'],';');
         foreach ($csv as $line) {
             fputcsv($file, $line, ';');
         }

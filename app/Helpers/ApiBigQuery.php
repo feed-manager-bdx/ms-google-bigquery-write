@@ -24,6 +24,8 @@ class ApiBigQuery extends Model
 {
     public function bigQuery($products)
     {
+        if ($products == []) return 0;
+
         for ($i=0; $i<sizeof($products); $i++) {
             $products[$i]=['data'=>$products[$i]];
         }
@@ -38,6 +40,6 @@ class ApiBigQuery extends Model
             $products
         );
 
-        return $insertResponse;
+        return 1;
     }
 }
