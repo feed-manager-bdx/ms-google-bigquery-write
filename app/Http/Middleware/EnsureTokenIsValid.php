@@ -24,12 +24,11 @@ class EnsureTokenIsValid
     public function handle(Request $request, Closure $next)
     {
         $configs = ConfigurationProvider::getConfig();
-
-        if(!isset($request->json()->all()['token']['projectId'])){
+        if(!$request->header('ProjectId')){
             throw new BadRequestHttpException("Unable to complete your request",);
         }
 
-        $projectId = $request->json()->all()['token']['projectId'];
+        $projectId = $request->header('ProjectId');
         $found = null;
 
         foreach($configs as $config){

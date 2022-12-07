@@ -15,4 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth.token')->post('/productsPrices', [\App\Http\Controllers\LowpriceController::class, 'productsPrices']);
-Route::middleware('auth.token')->post('/productsPricesCsv', [\App\Http\Controllers\LowpriceController::class, 'productPricesCsv']);
+Route::middleware('auth.token')->get('/productsPricesCsv/{merchantId}', [\App\Http\Controllers\LowpriceController::class, 'productPricesCsv']);
