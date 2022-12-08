@@ -45,7 +45,7 @@ class ApiGoogleStorage extends Model
             $productId=$row['productId'];
             $csv[] = [$productId, $min_price, $date];
         }
-        Log::info('CSV Entriez : '.sizeof($csv));
+        Log::info('CSV size for '.$merchant_id.$country_code.' : '.sizeof($csv));
         return $csv;
     }
 }
