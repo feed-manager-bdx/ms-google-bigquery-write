@@ -48,4 +48,30 @@ class ApiGoogleStorage extends Model
         Log::info('CSV size for '.$merchant_id.$country_code.' : '.sizeof($csv));
         return $csv;
     }
+
+    public function latestPrices($merchant_id, $country_code) {
+        $json = ConfigurationProvider::getJson();
+        $bigQuery = new BigQueryClient([
+            'projectId' => 'saaslowprices',
+            'keyFilePath' => $json
+        ]);
+        $query = "SELECT * FROM lowprice.view_latestsProductsPrices WHERE merchantId like(@merchant_id) AND countryCode like(@country_code)";
+        $queryJobConfig = $bigQuery->query($query)
+            ->parameters([
+                'merchant_id' => $merchant_id,
+                'country_code'=>$country_code
+            ]);
+        $queryResults = $bigQuery->runQuery($queryJobConfig);
+        $products = [];
+        foreach ($queryResults as $row) {
+            $promotionDate = $row['promotionDate'] == null ? null : $row['promotionDate']->formatAsString();
+            $price = $row['price'];
+            $merchantId = $row['merchantId'];
+            $salePrice = $row['salePrice'];
+            $countryCode=$row['countryCode'];
+            $productId=$row['productId'];
+            $products[] = ["productId" => $productId, "price" => $price, "promotionDate" => $promotionDate, "merchantId" => $merchantId, "salePrice" => $salePrice, "countryCode" => $countryCode];
+        }
+        return $products;
+    }
 }

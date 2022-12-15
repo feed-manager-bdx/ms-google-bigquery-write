@@ -35,4 +35,13 @@ class LowpriceController extends Controller
 
         return response($return);
     }
+
+    public function latestPrices(Request $request) {
+        $merchant_id=$request->route('merchantId');
+        $country_code=$request->query->get('countryCode');
+        Log::info($country_code);
+        $return = $this->apiGoogleStorage->latestPrices($merchant_id, $country_code);
+
+        return response($return);
+    }
 }
