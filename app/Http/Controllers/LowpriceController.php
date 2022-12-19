@@ -30,7 +30,6 @@ class LowpriceController extends Controller
     public function productPricesCsv(Request $request) {
         $merchant_id=$request->route('merchantId');
         $country_code=$request->query->get('countryCode');
-        Log::info($country_code);
         $return = $this->apiGoogleStorage->googleStorage($merchant_id, $country_code);
 
         return response($return);
