@@ -37,13 +37,17 @@ class ApiGoogleStorage extends Model
                 'merchant_id' => $merchant_id,
                 'country_code'=>$country_code
             ]);
-        $queryResults = $bigQuery->runQuery($queryJobConfig);
+        $queryResults = $bigQuery->runQuery($queryJobConfig, ['maxResults'=>5000]);
+        $isComplete = $queryResults->isComplete();
         $csv = [];
-        foreach ($queryResults as $row) {
-            $date = $row['date']->formatAsString();
-            $min_price = $row['minPrice'];
-            $productId=$row['productId'];
-            $csv[] = [$productId, $min_price, $date];
+        if ($isComplete) {
+            $rows = $queryResults->rows();
+            foreach ($rows as $row) {
+                $date = $row['date']->formatAsString();
+                $min_price = $row['minPrice'];
+                $productId=$row['productId'];
+                $csv[] = [$productId, $min_price, $date];
+            }
         }
         Log::info('CSV size for '.$merchant_id.$country_code.' : '.sizeof($csv));
         return $csv;
