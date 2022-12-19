@@ -77,6 +77,7 @@ class ApiGoogleStorage extends Model
                 $products[] = ["productId" => $productId, "price" => $price, "promotionDate" => $promotionDate, "merchantId" => $merchantId, "salePrice" => $salePrice, "countryCode" => $countryCode];
             }
         }
+        Log::info('Previous Products size for '.$merchant_id.$country_code.' : '.sizeof($products));
         return $products;
     }
 }
