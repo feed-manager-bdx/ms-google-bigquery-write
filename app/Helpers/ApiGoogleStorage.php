@@ -61,16 +61,21 @@ class ApiGoogleStorage extends Model
                 'merchant_id' => $merchant_id,
                 'country_code'=>$country_code
             ]);
-        $queryResults = $bigQuery->runQuery($queryJobConfig);
+        $queryResults = $bigQuery->runQuery($queryJobConfig, ['maxResults'=>5000]);
         $products = [];
-        foreach ($queryResults as $row) {
-            $promotionDate = $row['promotionDate'] == null ? null : $row['promotionDate']->formatAsString();
-            $price = $row['price'];
-            $merchantId = $row['merchantId'];
-            $salePrice = $row['salePrice'];
-            $countryCode=$row['countryCode'];
-            $productId=$row['productId'];
-            $products[] = ["productId" => $productId, "price" => $price, "promotionDate" => $promotionDate, "merchantId" => $merchantId, "salePrice" => $salePrice, "countryCode" => $countryCode];
+        $isComplete = $queryResults->isComplete();
+
+        if ($isComplete) {
+            $rows = $queryResults->rows();
+            foreach ($rows as $row) {
+                $promotionDate = $row['promotionDate'] == null ? null : $row['promotionDate']->formatAsString();
+                $price = $row['price'];
+                $merchantId = $row['merchantId'];
+                $salePrice = $row['salePrice'];
+                $countryCode=$row['countryCode'];
+                $productId=$row['productId'];
+                $products[] = ["productId" => $productId, "price" => $price, "promotionDate" => $promotionDate, "merchantId" => $merchantId, "salePrice" => $salePrice, "countryCode" => $countryCode];
+            }
         }
         return $products;
     }
