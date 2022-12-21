@@ -1,0 +1,302 @@
+{
+    "openapi": "3.0.0",
+    "servers": [
+        {
+            "url": "http://localhost:8084/api"
+        },
+        {
+            "url": "http://vps-da63b0f9.vps.ovh.net/api"
+        }
+    ],
+    "paths": {
+        "/productsPrices": {
+            "post": {
+                "tags": [
+                    "productsPrices BigQuery"
+                ],
+                "summary": "Posts products and prices to BigQuery",
+                "operationId": "f0b5df235e9a93cc95a48bbdd851acad",
+                "parameters": [
+                    {
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "X-Authorization",
+                        "in": "header",
+                        "description": "Authorization key",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "name": "ProjectId",
+                        "in": "header",
+                        "description": "Token access",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "description": "Products and Prices",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "products": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "price": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "productId": {
+                                                                "type": "string"
+                                                            },
+                                                            "merchantId": {
+                                                                "type": "string"
+                                                            },
+                                                            "countryCode": {
+                                                                "type": "string"
+                                                            },
+                                                            "price": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                            },
+                                                            "salePrice": {
+                                                                "type": "number",
+                                                                "format": "float"
+                                                            },
+                                                            "date": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "productId": {
+                                                                "type": "string"
+                                                            },
+                                                            "merchantId": {
+                                                                "type": "string"
+                                                            },
+                                                            "countryCode": {
+                                                                "type": "string"
+                                                            },
+                                                            "promotionDate": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Products posted with success"
+                    }
+                }
+            }
+        },
+        "/productsPricesCsv/{merchantId}": {
+            "get": {
+                "tags": [
+                    "productsPrices Csv"
+                ],
+                "summary": "Fetch from BigQuery min prices per products",
+                "operationId": "d20c0be2e7a703e1d79e8a9fda08d946",
+                "parameters": [
+                    {
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "X-Authorization",
+                        "in": "header",
+                        "description": "Authorization key",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "name": "ProjectId",
+                        "in": "header",
+                        "description": "Token access",
+                        "required": true
+                    },
+                    {
+                        "name": "merchantId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Products with min prices",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "productId": {
+                                                        "type": "string"
+                                                    },
+                                                    "minPrice": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/latestPrices/{merchantId}": {
+            "get": {
+                "tags": [
+                    "productPrices Latest"
+                ],
+                "summary": "Fetch from BigQuery last entry per product",
+                "operationId": "cf4845eb519d4bfd7a8a709b1ead1377",
+                "parameters": [
+                    {
+                        "name": "X-Timestamp",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "X-Authorization",
+                        "in": "header",
+                        "description": "Authorization key",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "name": "ProjectId",
+                        "in": "header",
+                        "description": "Token access",
+                        "required": true
+                    },
+                    {
+                        "name": "merchantId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Products with min prices",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "productId": {
+                                                        "type": "string"
+                                                    },
+                                                    "merchantId": {
+                                                        "type": "string"
+                                                    },
+                                                    "countryCode": {
+                                                        "type": "string"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "salePrice": {
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    },
+                                                    "promotionDate": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

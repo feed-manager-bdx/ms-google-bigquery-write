@@ -84,4 +84,33 @@ class ApiGoogleStorage extends Model
         Log::info('Previous Products size for '.$merchant_id.$country_code.' : '.sizeof($products));
         return $products;
     }
+
+    public function latestPricesTest() {
+        $json = ConfigurationProvider::getJson();
+        $bigQuery = new BigQueryClient([
+            'projectId' => 'saaslowprices',
+            'keyFilePath' => $json
+        ]);
+        $query = "SELECT productId, minPrice, date FROM lowprice.view_minPrices WHERE merchantId like(@merchant_id) AND countryCode like(@country_code)";
+        $queryJobConfig = $bigQuery->query($query)
+            ->parameters([
+                'merchant_id' => '7470747',
+                'country_code'=>'FR'
+            ]);
+        $queryResults = $bigQuery->runQuery($queryJobConfig, ['maxResults'=>5000]);
+        Log::info(($queryResults->info()));
+        $isComplete = $queryResults->isComplete();
+        $csv = [];
+        if ($isComplete) {
+            $rows = $queryResults->rows();
+            foreach ($rows as $row) {
+                $date = $row['date']->formatAsString();
+                $min_price = $row['minPrice'];
+                $productId=$row['productId'];
+                $csv[] = [$productId, $min_price, $date];
+            }
+        }
+        return $csv;
+
+    }
 }

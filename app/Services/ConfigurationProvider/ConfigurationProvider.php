@@ -12,7 +12,7 @@ class ConfigurationProvider
                 "protected-by" => [
                     'token' => [
                         'token' => 'teH1IPdu6h2y',
-                        'interval' => 100
+                        'interval' => 100000
                     ]
                 ]
             ],
