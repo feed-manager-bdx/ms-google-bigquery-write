@@ -50,7 +50,43 @@ class ApiGoogleStorage extends Model
             }
         }
         Log::info('CSV size for '.$merchant_id.$country_code.' : '.sizeof($csv));
+        $this->uploadCsv($merchant_id, $country_code, $csv);
         return $csv;
+    }
+
+    public function uploadCsv($merchant_id, $country_code, $products) {
+        Log::info('Posting CSV for '.$merchant_id.$country_code);
+        $json = ConfigurationProvider::getJson();
+        $csv = $products ?? [];
+        $fileName = $merchant_id.'-'.$country_code.".csv";
+        $storagePath = storage_path('/app/public/csv/');
+
+        if (!is_dir($storagePath)) {
+            mkdir($storagePath);
+        }
+
+        $file = fopen($storagePath.$fileName,"w");
+        fputcsv($file, ['product_id', 'min_price', 'date'],';');
+        foreach ($csv as $line) {
+            fputcsv($file, $line, ';');
+        }
+        fclose($file);
+        $storage = new StorageClient([
+            'projectId' => 'saaslowprices',
+            'keyFilePath' => $json
+        ]);
+        $bucketName = 'lowpricecsv';
+        $bucket = $storage->bucket($bucketName);
+        $resultBucket = $bucket->upload(
+            fopen($storagePath.$fileName, 'r'),
+            [
+                'predefinedAcl' => 'publicRead'
+            ]
+        );
+
+        if(is_file($storagePath.$fileName)) {
+            unlink($storagePath.$fileName);
+        }
     }
 
     public function latestPrices($merchant_id, $country_code) {
